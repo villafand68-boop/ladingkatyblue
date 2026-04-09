@@ -19,84 +19,90 @@
       border: 4px solid rgba(255,255,255,0.1);
       border-left-color: #25D366;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
-
-  <script>
-    const PIXEL_ID = '1491313232345277';
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=true;
-    t.src=v;s=b.getElementsByTagName(e);
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    
-    fbq('init', PIXEL_ID);
-  </script>
 </head>
 <body>
   <div class="loader"></div>
 
-<script>
-  // 1. Configuración del destino y obtención de datos
-  const numero = '5491161190295'; // Tu nuevo número
-  const nombre = (sessionStorage.getItem('wa_nombre') || '').trim();
-  const eventId = sessionStorage.getItem('wa_event_id');
+  <script>
+    const WORKER_URL = "https://TU-WORKER.workers.dev";
+    const REDIRECT_URL = "https://wa.me/5491161190295"; // cambiá esto si querés otro destino
 
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  }
+    const nombre = (sessionStorage.getItem('wa_nombre') || '').trim();
+    const eventId = sessionStorage.getItem('wa_event_id');
 
-  async function procesarYRedirigir() {
-    if (!nombre || !eventId) {
-      window.location.href = 'index.html';
-      return;
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return '';
     }
 
-    // --- PASO A: DISPARO EN EL NAVEGADOR (Para deduplicación) ---
-    fbq('track', 'Contact', {}, { eventID: eventId });
+    async function procesarYRedirigir() {
+      if (!nombre || !eventId) {
+        window.location.replace('index.html');
+        return;
+      }
 
-    try {
-      // --- PASO B: DISPARO EN EL SERVIDOR (Worker) ---
-      await fetch("https://katyblue.daniyons1996.workers.dev/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        keepalive: true, 
-        body: JSON.stringify({
-          event_id: eventId,
-          event_name: "Contact",
-          nombre: nombre,
-          page_url: window.location.href,
-          fbp: getCookie('_fbp'),
-          fbc: getCookie('_fbc')
-        })
-      });
-      console.log("Evento enviado al servidor");
-    } catch (error) {
-      console.error("Error al contactar al Worker:", error);
+      const sentKey = 'sent_' + eventId;
+
+      // Si ya se envió este event_id en esta sesión, no lo reenvía
+      if (sessionStorage.getItem(sentKey) === '1') {
+        const mensajeRapido = `Hola, soy ${nombre} y quiero más información`;
+        const salidaRapida = REDIRECT_URL.includes('wa.me')
+          ? `${REDIRECT_URL}?text=${encodeURIComponent(mensajeRapido)}`
+          : REDIRECT_URL;
+        window.location.replace(salidaRapida);
+        return;
+      }
+
+      sessionStorage.setItem(sentKey, '1');
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({
+            event_id: eventId,
+            event_name: 'Contact',
+            page_url: window.location.href,
+            nombre: nombre,
+            fbp: getCookie('_fbp'),
+            fbc: getCookie('_fbc')
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        console.log('Respuesta Worker:', data);
+
+        if (!res.ok) {
+          console.error('Worker respondió error');
+        }
+      } catch (err) {
+        console.error('Error enviando al worker:', err);
+      }
+
+      const mensaje = `Hola, soy ${nombre} y quiero más información`;
+      const finalUrl = REDIRECT_URL.includes('wa.me')
+        ? `${REDIRECT_URL}?text=${encodeURIComponent(mensaje)}`
+        : REDIRECT_URL;
+
+      setTimeout(() => {
+        sessionStorage.removeItem('wa_event_id');
+        sessionStorage.removeItem('wa_nombre');
+        window.location.replace(finalUrl);
+      }, 1200);
     }
 
-    // 2. Preparación del enlace de WhatsApp
-    const mensaje = `Hola, soy ${nombre} y quiero más información`;
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-
-    // 3. Esperamos un poco para asegurar que el Píxel se envíe antes de salir
-    setTimeout(() => {
-      window.location.href = url;
-    }, 800); 
-  }
-
-  // Iniciar proceso
-  procesarYRedirigir();
-</script>
+    procesarYRedirigir();
+  </script>
 </body>
 </html>
