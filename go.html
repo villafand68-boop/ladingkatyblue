@@ -23,21 +23,32 @@
       height: 40px;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
+
+  <script>
+    const PIXEL_ID = '1491313232345277';
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=true;
+    t.src=v;s=b.getElementsByTagName(e);
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    fbq('init', PIXEL_ID);
+  </script>
 </head>
 <body>
   <div class="loader"></div>
 
 <script>
-  // Configuración del destino
-  const numero = '5491161190295';
+  // 1. Configuración del destino y obtención de datos
+  const numero = '5491161190295'; // Tu nuevo número
   const nombre = (sessionStorage.getItem('wa_nombre') || '').trim();
   const eventId = sessionStorage.getItem('wa_event_id');
 
-  // Función corregida para obtener cookies de Meta (_fbp, _fbc)
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -46,15 +57,16 @@
   }
 
   async function procesarYRedirigir() {
-    // Si no hay datos, volvemos al inicio
     if (!nombre || !eventId) {
       window.location.href = 'index.html';
       return;
     }
 
+    // --- PASO A: DISPARO EN EL NAVEGADOR (Para deduplicación) ---
+    fbq('track', 'Contact', {}, { eventID: eventId });
+
     try {
-      // Enviamos el evento al Worker de Cloudflare
-      // keepalive: true asegura que la petición termine aunque el usuario salga de la página
+      // --- PASO B: DISPARO EN EL SERVIDOR (Worker) ---
       await fetch("https://katyblue.daniyons1996.workers.dev/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +75,7 @@
           event_id: eventId,
           event_name: "Contact",
           nombre: nombre,
-          page_url: window.location.href, // Envía tu dominio real automáticamente
+          page_url: window.location.href,
           fbp: getCookie('_fbp'),
           fbc: getCookie('_fbc')
         })
@@ -73,17 +85,17 @@
       console.error("Error al contactar al Worker:", error);
     }
 
-    // Preparación del enlace de WhatsApp
+    // 2. Preparación del enlace de WhatsApp
     const mensaje = `Hola, soy ${nombre} y quiero más información`;
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 
-    // Esperamos 1.2 segundos para que el servidor de Meta procese el evento
+    // 3. Esperamos un poco para asegurar que el Píxel se envíe antes de salir
     setTimeout(() => {
-      window.location.replace(url);
-    }, 1200);
+      window.location.href = url;
+    }, 800); 
   }
 
-  // Iniciar el proceso
+  // Iniciar proceso
   procesarYRedirigir();
 </script>
 </body>
