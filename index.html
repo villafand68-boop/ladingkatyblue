@@ -8,10 +8,6 @@
   <script>
     const PIXEL_ID = '1491313232345277';
 
-    function generateEventId() {
-      return 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-    }
-
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -125,11 +121,13 @@
       font-size: 32px;
       font-weight: bold;
       text-decoration: none;
+      border: none;
       border-radius: 8px;
       box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
       animation: pulse 1.5s infinite, float 3s ease-in-out infinite;
       transform: perspective(500px) rotateX(0deg) rotateY(0deg);
-      transition: transform 0.3s;
+      transition: transform 0.3s, opacity 0.3s;
+      cursor: pointer;
     }
 
     .button:hover {
@@ -139,6 +137,11 @@
     .button img {
       width: 50px;
       height: 50px;
+    }
+
+    .button.disabled {
+      pointer-events: none;
+      opacity: 0.7;
     }
 
     @keyframes pulse {
@@ -256,15 +259,10 @@
     <div class="subtitle">👇 Tocá el botón y comunicate ahora mismo 👇</div>
     <div class="pre-input">👉 Toca el botón para continuar</div>
 
-    <a
-      href="https://api.whatsapp.com/send?phone=541161190266&text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n"
-      class="button"
-      id="whatsappButton"
-      rel="noopener noreferrer"
-    >
+    <button class="button" id="whatsappButton" type="button">
       <img src="whatsapp-icon.png" alt="WhatsApp">
       Contactar por WhatsApp
-    </a>
+    </button>
 
     <div class="active-users">
       <span class="green-dot"></span>
@@ -326,48 +324,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const whatsappBtn = document.getElementById('whatsappButton');
-      let contactSent = false;
-
       if (!whatsappBtn) return;
 
-      whatsappBtn.addEventListener('click', function (event) {
-        if (contactSent) {
-          event.preventDefault();
-          return;
-        }
-
-        contactSent = true;
-        event.preventDefault();
-
-        const targetUrl = whatsappBtn.href;
-        const eventId = generateEventId();
-
-        const fbp = localStorage.getItem('fbp') || getCookie('_fbp') || null;
-        const fbc = localStorage.getItem('fbc') || getCookie('_fbc') || null;
-
-        try {
-          fetch('https://katyblue.daniyons1996.workers.dev/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            keepalive: true,
-            body: JSON.stringify({
-              event_name: 'Contact',
-              event_id: eventId,
-              page_url: window.location.href,
-              fbp: fbp,
-              fbc: fbc
-            })
-          }).catch(function (error) {
-            console.error('Error enviando Contact al worker:', error);
-          });
-        } catch (error) {
-          console.error('Error general en el click:', error);
-        }
-
-        window.location.href = targetUrl;
-      });
+      whatsappBtn.addEventListener('click', function () {
+        whatsappBtn.classList.add('disabled');
+        window.location.href = 'go.html';
+      }, { once: true });
     });
   </script>
 </body>
