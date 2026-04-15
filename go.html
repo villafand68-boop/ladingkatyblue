@@ -5,129 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Redirigiendo...</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .box {
-      max-width: 500px;
-    }
-
-    .loader {
-      width: 60px;
-      height: 60px;
-      border: 5px solid rgba(255,255,255,0.2);
-      border-top-color: #25D366;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px auto;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .title {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .text {
-      font-size: 18px;
-      color: #ccc;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+    .loader { width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.2); border-top-color: #25D366; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="box">
     <div class="loader"></div>
-    <div class="title">Redirigiendo a WhatsApp...</div>
-    <div class="text">Aguardá un momento</div>
+    <div class="title">Conectando con un Acesor...</div>
   </div>
 
   <script>
     const WHATSAPP_URL = 'https://api.whatsapp.com/send?phone=541161190266&text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n';
     const WORKER_URL = 'https://katyblue.daniyons1996.workers.dev/';
 
-    function generateEventId() {
-      return 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-    }
+    async function processAndRedirect() {
+      // Recuperar el ID del index.html
+      const eventId = sessionStorage.getItem('wa_event_id') || ('evt_' + Date.now());
+      
+      const fbp = localStorage.getItem('fbp');
+      const fbc = localStorage.getItem('fbc');
 
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        return parts.pop().split(';').shift();
-      }
-      return null;
-    }
+      // Enviar al Worker (Segundo plano)
+      fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: 'Contact',
+          event_id: eventId,
+          page_url: window.location.href,
+          fbp: fbp,
+          fbc: fbc
+        }),
+        keepalive: true
+      }).catch(err => console.log("Worker error ignored"));
 
-    function getMetaSignals() {
-      const params = new URLSearchParams(window.location.search);
-      const fbclid = params.get('fbclid') || localStorage.getItem('fbclid');
-
-      let fbp = localStorage.getItem('fbp') || getCookie('_fbp') || null;
-      let fbc = localStorage.getItem('fbc') || getCookie('_fbc') || null;
-
-      if (!fbc && fbclid) {
-        fbc = `fb.1.${Date.now()}.${fbclid}`;
-        localStorage.setItem('fbc', fbc);
-      }
-
-      return { fbp, fbc };
-    }
-
-    async function sendContactAndRedirect() {
-      try {
-        if (sessionStorage.getItem('contact_sent') === '1') {
-          window.location.replace(WHATSAPP_URL);
-          return;
-        }
-
-        sessionStorage.setItem('contact_sent', '1');
-
-        let eventId = sessionStorage.getItem('wa_event_id');
-        if (!eventId) {
-          eventId = generateEventId();
-          sessionStorage.setItem('wa_event_id', eventId);
-        }
-
-        const { fbp, fbc } = getMetaSignals();
-
-        await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          keepalive: true,
-          body: JSON.stringify({
-            event_name: 'Contact',
-            event_id: eventId,
-            page_url: document.referrer || window.location.href,
-            fbp: fbp,
-            fbc: fbc
-          })
-        });
-
-      } catch (error) {
-        console.error('Error enviando Contact al worker:', error);
-      }
-
+      // Redirigir inmediatamente a WhatsApp sin esperar al Worker
       setTimeout(() => {
         window.location.replace(WHATSAPP_URL);
-      }, 500);
+      }, 400);
     }
 
-    sendContactAndRedirect();
+    window.onload = processAndRedirect;
   </script>
 </body>
 </html>
