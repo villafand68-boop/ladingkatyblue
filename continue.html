@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Redirigiendo...</title>
+
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KLJ87X27');
+  </script>
+  <!-- End GTM -->
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: #fff;
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .loader {
+      border: 5px solid rgba(255,255,255,0.2);
+      border-top: 5px solid #25D366;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- GTM NOSCRIPT -->
+<noscript>
+  <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KLJ87X27"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+
+<div>
+  <div class="loader"></div>
+  <h2>Redirigiendo a un Acesor ...</h2>
+</div>
+
+<script>
+  // 🔥 TU LINK ORIGINAL (igual que antes)
+  const REDIRECT_URL = "https://api.whatsapp.com/send?phone=541161190266&text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n";
+
+  setTimeout(() => {
+    window.location.replace(REDIRECT_URL);
+  }, 500);
+</script>
+
+</body>
+</html>
