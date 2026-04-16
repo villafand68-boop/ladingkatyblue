@@ -5,139 +5,157 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GOLDEN BLACK</title>
 
+  <!-- Google Tag Manager -->
   <script>
-    const PIXEL_ID = '1491313232345277';
-
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        return parts.pop().split(';').shift();
-      }
-      return null;
-    }
-
-    function persistMetaSignals() {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const fbclid = params.get('fbclid');
-
-        const cookieFbp = getCookie('_fbp');
-        if (cookieFbp) {
-          localStorage.setItem('fbp', cookieFbp);
-        }
-
-        const cookieFbc = getCookie('_fbc');
-        if (cookieFbc) {
-          localStorage.setItem('fbc', cookieFbc);
-        } else if (fbclid) {
-          const generatedFbc = `fb.1.${Date.now()}.${fbclid}`;
-          localStorage.setItem('fbc', generatedFbc);
-          localStorage.setItem('fbclid', fbclid);
-        }
-      } catch (error) {
-        console.error('Error guardando señales Meta:', error);
-      }
-    }
-
-    persistMetaSignals();
-
-    !function(f,b,e,v,n,t,s) {
-      if (f.fbq) return;
-      n = f.fbq = function() {
-        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
-      };
-      if (!f._fbq) f._fbq = n;
-      n.push = n;
-      n.loaded = true;
-      n.version = '2.0';
-      n.queue = [];
-      t = b.createElement(e);
-      t.async = true;
-      t.src = v;
-      s = b.getElementsByTagName(e);
-      s.parentNode.insertBefore(t, s);
-    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-
-    fbq('set', 'autoConfig', false, PIXEL_ID);
-    fbq('init', PIXEL_ID);
-    fbq('track', 'PageView');
-    fbq('track', 'ViewContent');
+    (function(w,d,s,l,i){
+      w[l]=w[l]||[];
+      w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+      var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+      j.async=true;
+      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+      f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KLJ87X27');
   </script>
+  <!-- End Google Tag Manager -->
 
   <style>
-    body { margin: 0; padding: 0; background: url('imagen verde.png') no-repeat center center fixed; background-size: cover; font-family: Arial, sans-serif; text-align: center; color: white; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('imagen verde.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+    }
+
     .container { padding: 50px 20px; }
-    .logo { width: 300px; height: 300px; background: url('logo_golden_black.png') no-repeat center center; background-size: cover; border-radius: 50%; margin: 80px auto 20px auto; box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+
+    .logo {
+      width: 300px;
+      height: 300px;
+      background: url('logo_golden_black.png') no-repeat center center;
+      background-size: cover;
+      border-radius: 50%;
+      margin: 80px auto 20px auto;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    }
+
     .title { font-size: 45px; margin: 30px 0; }
-    .subtitle { font-size: 28px; color: #FFA500; margin-bottom: 40px; }
-    .pre-input { background: rgba(0, 0, 0, 0.6); display: inline-block; padding: 10px 20px; border-radius: 6px; font-size: 20px; margin-bottom: 20px; }
-    .button { display: inline-flex; align-items: center; justify-content: center; gap: 15px; padding: 25px 50px; background-color: #25D366; color: white; font-size: 32px; font-weight: bold; text-decoration: none; border: none; border-radius: 8px; box-shadow: 0 0 25px rgba(0, 255, 0, 0.6); animation: pulse 1.5s infinite, float 3s ease-in-out infinite; transition: transform 0.3s, opacity 0.3s; cursor: pointer; }
-    .button:hover { transform: scale(1.05); }
-    .button img { width: 50px; height: 50px; }
-    .button.disabled { pointer-events: none; opacity: 0.7; }
-    @keyframes pulse { 0% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); } 50% { box-shadow: 0 0 35px rgba(0, 255, 0, 1); } 100% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); } }
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-    .footer { font-size: 32px; margin-top: 50px; color: #FF8C00; }
-    .info { margin-top: 20px; background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 8px; display: inline-block; font-size: 22px; }
-    #popup-container { position: fixed; bottom: 20px; left: 20px; width: 320px; z-index: 9999; }
-    .popup { background: rgba(0, 0, 0, 0.8); color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px; font-size: 18px; display: flex; align-items: center; gap: 10px; }
-    .active-users { margin-top: 20px; font-size: 18px; background: rgba(0, 0, 0, 0.6); display: inline-block; padding: 8px 15px; border-radius: 6px; }
-    footer { position: fixed; bottom: 5px; width: 100%; text-align: center; font-size: 12px; color: white; }
+
+    .subtitle {
+      font-size: 28px;
+      color: #FFA500;
+      margin-bottom: 40px;
+    }
+
+    .pre-input {
+      background: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 25px 50px;
+      background-color: #25D366;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      text-decoration: none;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 0 25px rgba(0, 255, 0, 0.6);
+      cursor: pointer;
+    }
+
+    .footer {
+      font-size: 32px;
+      margin-top: 50px;
+      color: #FF8C00;
+    }
+
+    .info {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+      font-size: 22px;
+    }
+
+    .active-users {
+      margin-top: 20px;
+      font-size: 18px;
+      background: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 6px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+    }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="logo"></div>
-    <div class="title">🍀 UNITE A LOS QUE ESTÁN GANANDO 🍀</div>
-    <div class="subtitle">👇 Tocá el botón y comunicate ahora mismo 👇</div>
-    <div class="pre-input">👉 Toca el botón para continuar</div>
 
-    <button class="button" id="whatsappButton" type="button">
-      <img src="whatsapp-icon.png" alt="WhatsApp">
-      Contactar por WhatsApp
-    </button>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+  <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KLJ87X27"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End GTM -->
 
-    <div class="active-users">Usuarios activos: <span id="user-count">87567</span></div>
-    <div class="footer">🔥 ACTIVOS 24/7 - PAGOS SIN LÍMITES 🔥</div>
+<div class="container">
+  <div class="logo"></div>
+
+  <div class="title">🍀 UNITE A LOS QUE ESTÁN GANANDO 🍀</div>
+  <div class="subtitle">👇 Tocá el botón y comunicate ahora 👇</div>
+  <div class="pre-input">👉 Toca el botón para continuar</div>
+
+  <button class="button" id="whatsappButton">
+    Contactar por WhatsApp
+  </button>
+
+  <div class="active-users">
+    Usuarios activos: <span id="user-count">87567</span>
   </div>
 
-  <div id="popup-container"></div>
-  <footer>Only for users aged 18+. No real money can be won.</footer>
+  <div class="footer">🔥 ACTIVOS 24/7 🔥</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const whatsappBtn = document.getElementById('whatsappButton');
-      if (!whatsappBtn) return;
+  <div class="info">
+    <div>🎧 Atención 24/7</div>
+    <div>💸 Pagos al instante</div>
+    <div>🔞 +18</div>
+  </div>
+</div>
 
-      whatsappBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        // 1. Generar ID único
-        const eventId = 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-        sessionStorage.setItem('wa_event_id', eventId);
+<footer>Only for users aged 18+</footer>
 
-        // 2. Disparar Pixel
-        if (typeof fbq !== 'undefined') {
-          fbq('track', 'Contact', {}, { eventID: eventId });
-        }
+<script>
+  document.getElementById("whatsappButton").addEventListener("click", function() {
+    window.location.href = "go.html";
+  });
 
-        whatsappBtn.classList.add('disabled');
-        whatsappBtn.innerText = "Cargando...";
+  let count = 87567;
+  setInterval(() => {
+    count += 3;
+    document.getElementById("user-count").innerText = count;
+  }, 5000);
+</script>
 
-        // 3. Forzar redirección manual
-        setTimeout(() => {
-          window.location.href = 'go.html';
-        }, 500);
-      });
-    });
-
-    // Lógica de decoraciones (Popups y contador)
-    let userCount = 87567;
-    setInterval(() => {
-      userCount += Math.floor(Math.random() * 5);
-      document.getElementById("user-count").innerText = userCount.toLocaleString("es-AR");
-    }, 4000);
-  </script>
 </body>
 </html>
