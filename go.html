@@ -2,45 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Redirigiendo...</title>
-
-  <!-- Google Tag Manager -->
-  <script>
-    (function(w,d,s,l,i){
-      w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-      var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-      j.async=true;
-      j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-      f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KLJ87X27');
-  </script>
-  <!-- End GTM -->
 
   <style>
     body {
-      margin: 0;
-      background: #111;
-      color: #fff;
-      font-family: Arial;
+      background-color: #051a05;
+      color: white;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      text-align: center;
+      margin: 0;
     }
-
     .loader {
-      border: 5px solid rgba(255,255,255,0.2);
-      border-top: 5px solid #25D366;
+      border: 4px solid rgba(255,255,255,0.1);
+      border-left-color: #25D366;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
+      width: 40px;
+      height: 40px;
       animation: spin 1s linear infinite;
-      margin: auto;
     }
-
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -48,25 +31,63 @@
 </head>
 
 <body>
-
-<!-- GTM NOSCRIPT -->
-<noscript>
-  <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KLJ87X27"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe>
-</noscript>
-
-<div>
   <div class="loader"></div>
-  <h2>Redirigiendo a un Acesor ...</h2>
-</div>
 
 <script>
-  // 🔥 TU LINK ORIGINAL (igual que antes)
-  const REDIRECT_URL = "https://numerodegoldenblue2.netlify.app";
+  // Datos desde la landing
+  const nombre = (sessionStorage.getItem('wa_nombre') || '').trim();
+  const eventId = sessionStorage.getItem('wa_event_id');
 
-  setTimeout(() => {
-    window.location.replace(REDIRECT_URL);
-  }, 200);
+  // Función para cookies (_fbp, _fbc)
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
+
+  async function procesarYRedirigir() {
+
+    // Si falta info, vuelve al inicio
+    if (!nombre || !eventId) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    try {
+      // Enviar evento al servidor (CAPI)
+      await fetch("https://katyblue.daniyons1996.workers.dev/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        keepalive: true,
+        body: JSON.stringify({
+          event_id: eventId,
+          event_name: "",
+          nombre: nombre,
+          page_url: window.location.href,
+          fbp: getCookie('_fbp'),
+          fbc: getCookie('_fbc')
+        })
+      });
+
+      console.log("Evento enviado al servidor");
+
+    } catch (error) {
+      console.error("Error en el Worker:", error);
+    }
+
+    // 🔥 TU LINK EN VEZ DEL NÚMERO
+    const mensaje = `Hola, soy ${nombre} y quiero más información`;
+    const linkDestino = "https://numerodegoldenblue2.netlify.app";
+    const url = `${linkDestino}?text=${encodeURIComponent(mensaje)}`;
+
+    // Espera para asegurar envío del evento
+    setTimeout(() => {
+      window.location.replace(url);
+    }, 1200);
+  }
+
+  procesarYRedirigir();
 </script>
 
 </body>
