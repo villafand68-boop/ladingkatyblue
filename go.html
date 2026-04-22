@@ -46,6 +46,15 @@
     return null;
   }
 
+  // 🔥 NUEVO: prioridad a sessionStorage (mejor señal)
+  function getBestFbp() {
+    return sessionStorage.getItem('wa_fbp') || getCookie('_fbp');
+  }
+
+  function getBestFbc() {
+    return sessionStorage.getItem('wa_fbc') || getCookie('_fbc');
+  }
+
   async function procesarYRedirigir() {
 
     // Si falta info, vuelve al inicio
@@ -65,8 +74,8 @@
           event_name: "",
           nombre: nombre,
           page_url: window.location.href,
-          fbp: getCookie('_fbp'),
-          fbc: getCookie('_fbc')
+          fbp: getBestFbp(), // 🔥 cambiado
+          fbc: getBestFbc()  // 🔥 cambiado
         })
       });
 

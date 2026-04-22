@@ -12,6 +12,40 @@ function generateEventId() {
   return 'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
 }
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+function getOrBuildFbc() {
+  try {
+    const url = new URL(window.location.href);
+    const fbclid = url.searchParams.get('fbclid');
+
+    if (fbclid) {
+      const existingFbc = getCookie('_fbc');
+      if (existingFbc) return existingFbc;
+      return `fb.1.${Date.now()}.${fbclid}`;
+    }
+
+    return getCookie('_fbc') || '';
+  } catch (e) {
+    return getCookie('_fbc') || '';
+  }
+}
+
+function saveTrackingData() {
+  const fbp = getCookie('_fbp') || '';
+  const fbc = getOrBuildFbc() || '';
+
+  if (fbp) sessionStorage.setItem('wa_fbp', fbp);
+  if (fbc) sessionStorage.setItem('wa_fbc', fbc);
+
+  sessionStorage.setItem('wa_landing_url', window.location.href);
+}
+
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -24,7 +58,10 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('set', 'autoConfig', false, PIXEL_ID);
 fbq('init', PIXEL_ID);
 
-// Solo PageView en el navegador
+// Guardar señales apenas entra el usuario
+saveTrackingData();
+
+// Solo PageView en navegador
 const pageEventId = generateEventId();
 fbq('track', 'PageView', {}, { eventID: pageEventId });
 </script>
@@ -36,8 +73,8 @@ body { margin:0; padding:0; background:url('imagen verde.png') no-repeat center 
 .title { font-size:32px; font-weight:bold; margin:20px 0; }
 .subtitle { font-size:20px; color:#FFA500; margin-bottom:25px; }
 .zona-ingreso-v9 { background:rgba(0,0,0,.6); padding:25px; border-radius:10px; max-width:420px; margin:0 auto; }
-input { width:100%; padding:15px; font-size:18px; border-radius:6px; border:none; margin-bottom:15px; color: black; }
-.disparador-accion-x8 { width:100%; padding:18px; background-color:#25D366; color:white; font-size:22px; font-weight:bold; border-radius:8px; cursor:pointer; box-shadow:0 0 20px rgba(0,255,0,0.4); }
+input { width:100%; padding:15px; font-size:18px; border-radius:6px; border:none; margin-bottom:15px; color: black; box-sizing: border-box; }
+.disparador-accion-x8 { width:100%; padding:18px; background-color:#25D366; color:white; font-size:22px; font-weight:bold; border-radius:8px; cursor:pointer; box-shadow:0 0 20px rgba(0,255,0,0.4); box-sizing: border-box; }
 .active-users { margin-top:18px; font-size:16px; background:rgba(0,0,0,.6); display:inline-block; padding:8px 15px; border-radius:6px; }
 .green-dot { background:#00FF00; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
 @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.5; } }
@@ -82,7 +119,9 @@ disparador.addEventListener('pointerdown', function () {
     return;
   }
 
-  // Generamos el Event ID para que el SERVIDOR lo use
+  // Refresca por si cambió algo en la URL/cookies antes del click
+  saveTrackingData();
+
   let eventId = sessionStorage.getItem('wa_event_id');
   if (!eventId) {
     eventId = generateEventId();
@@ -91,15 +130,13 @@ disparador.addEventListener('pointerdown', function () {
 
   sessionStorage.setItem('wa_nombre', nombreValue);
 
-  // SE ELIMINÓ:  
-  // Ahora el navegador NO envía el Lead, solo redirige a go.html
-
   window.location.href = 'go.html';
 });
 
-// POPUPS Y CONTADOR (Sin cambios)
+// POPUPS Y CONTADOR
 const winners = ["Laura M.","Pedro T.","Mariana L.","Carlos G.","Lucía F.","Martín P."];
 let winnerIndex = 0;
+
 function showPopup(){
   const container = document.getElementById("popup-container");
   container.innerHTML = "";
