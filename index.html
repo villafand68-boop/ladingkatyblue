@@ -340,11 +340,17 @@
         event.preventDefault();
 
         const targetUrl = whatsappBtn.href;
+
+        // 1. Generar el eventId UNA SOLA VEZ
         const eventId = generateEventId();
 
         const fbp = localStorage.getItem('fbp') || getCookie('_fbp') || null;
         const fbc = localStorage.getItem('fbc') || getCookie('_fbc') || null;
 
+        // 2. Disparar el evento en el NAVEGADOR con el mismo eventId
+        fbq('track', 'Contact', {}, { eventID: eventId });
+
+        // 3. Enviar al SERVIDOR (Worker) con el mismo eventId
         try {
           fetch('https://katyblue.daniyons1996.workers.dev/', {
             method: 'POST',
@@ -353,7 +359,7 @@
             },
             keepalive: true,
             body: JSON.stringify({
-              event_name: 'Contact',
+              event_name: 'Lead',
               event_id: eventId,
               page_url: window.location.href,
               fbp: fbp,
@@ -366,6 +372,7 @@
           console.error('Error general en el click:', error);
         }
 
+        // 4. Redirigir al usuario
         window.location.href = targetUrl;
       });
     });
